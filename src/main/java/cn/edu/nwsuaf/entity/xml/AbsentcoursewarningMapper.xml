@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.edu.nwsuaf.mapper.AbsentcoursewarningMapper">
+    <resultMap id="BaseResultMap" type="cn.edu.nwsuaf.entity.Absentcoursewarning">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="warninglevelid" property="warninglevelid" jdbcType="INTEGER"/>
+        <result column="opencourseid" property="opencourseid" jdbcType="INTEGER"/>
+        <result column="studentid" property="studentid" jdbcType="INTEGER"/>
+        <result column="times" property="times" jdbcType="INTEGER"/>
+        <result column="statisticstime" property="statisticstime" jdbcType="DATE"/>
+        <result column="warningdate" property="warningdate" jdbcType="DATE"/>
+    </resultMap>
+    <resultMap id="AbsentCourseWarnModelMap" type="cn.edu.nwsuaf.model.AbsentCourseModel">
+        <result column="coursename" property="course" jdbcType="VARCHAR"/>
+        <result column="warninglevelname" property="warnlevel" jdbcType="VARCHAR"/>
+        <result column="times" property="absenttimes" jdbcType="INTEGER"/>
+        <result column="warningdate" property="date" jdbcType="DATE"/>
+    </resultMap>
+
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
+    id, warninglevelid, opencourseid, studentid, times, statisticstime, warningdate
+  </sql>
+    <select id="selectAbsentCourseWarnByStudentId" resultMap="AbsentCourseWarnModelMap">
+    SELECT  coursename,warninglevelname,times,warningdate
+    FROM ABSENTCOURSEWARNING,WARNINGLEVEL,BT_OPENCOURSE,BT_COURSE
+    WHERE
+    ABSENTCOURSEWARNING.studentid=#{studentid}
+    AND ABSENTCOURSEWARNING.warninglevelid=WARNINGLEVEL.id
+    AND ABSENTCOURSEWARNING.opencourseid=BT_OPENCOURSE.id
+    AND BT_OPENCOURSE.courseid=BT_COURSE.id;
+  </select>
+    <select id="selectByExample" resultMap="BaseResultMap"
+            parameterType="cn.edu.nwsuaf.entity.AbsentcoursewarningExample">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List"/>
+        from ABSENTCOURSEWARNING
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from ABSENTCOURSEWARNING
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from ABSENTCOURSEWARNING
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+    <delete id="deleteByExample" parameterType="cn.edu.nwsuaf.entity.AbsentcoursewarningExample">
+        delete from ABSENTCOURSEWARNING
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </delete>
+    <insert id="insert" parameterType="cn.edu.nwsuaf.entity.Absentcoursewarning">
+    insert into ABSENTCOURSEWARNING (id, warninglevelid, opencourseid, 
+      studentid, times, statisticstime, 
+      warningdate)
+    values (#{id,jdbcType=INTEGER}, #{warninglevelid,jdbcType=INTEGER}, #{opencourseid,jdbcType=INTEGER}, 
+      #{studentid,jdbcType=INTEGER}, #{times,jdbcType=INTEGER}, #{statisticstime,jdbcType=DATE}, 
+      #{warningdate,jdbcType=DATE})
+  </insert>
+    <insert id="insertSelective" parameterType="cn.edu.nwsuaf.entity.Absentcoursewarning">
+        insert into ABSENTCOURSEWARNING
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="warninglevelid != null">
+                warninglevelid,
+            </if>
+            <if test="opencourseid != null">
+                opencourseid,
+            </if>
+            <if test="studentid != null">
+                studentid,
+            </if>
+            <if test="times != null">
+                times,
+            </if>
+            <if test="statisticstime != null">
+                statisticstime,
+            </if>
+            <if test="warningdate != null">
+                warningdate,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="warninglevelid != null">
+                #{warninglevelid,jdbcType=INTEGER},
+            </if>
+            <if test="opencourseid != null">
+                #{opencourseid,jdbcType=INTEGER},
+            </if>
+            <if test="studentid != null">
+                #{studentid,jdbcType=INTEGER},
+            </if>
+            <if test="times != null">
+                #{times,jdbcType=INTEGER},
+            </if>
+            <if test="statisticstime != null">
+                #{statisticstime,jdbcType=DATE},
+            </if>
+            <if test="warningdate != null">
+                #{warningdate,jdbcType=DATE},
+            </if>
+        </trim>
+    </insert>
+    <select id="countByExample" parameterType="cn.edu.nwsuaf.entity.AbsentcoursewarningExample"
+            resultType="java.lang.Integer">
+        select count(*) from ABSENTCOURSEWARNING
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </select>
+    <update id="updateByExampleSelective" parameterType="map">
+        update ABSENTCOURSEWARNING
+        <set>
+            <if test="record.id != null">
+                id = #{record.id,jdbcType=INTEGER},
+            </if>
+            <if test="record.warninglevelid != null">
+                warninglevelid = #{record.warninglevelid,jdbcType=INTEGER},
+            </if>
+            <if test="record.opencourseid != null">
+                opencourseid = #{record.opencourseid,jdbcType=INTEGER},
+            </if>
+            <if test="record.studentid != null">
+                studentid = #{record.studentid,jdbcType=INTEGER},
+            </if>
+            <if test="record.times != null">
+                times = #{record.times,jdbcType=INTEGER},
+            </if>
+            <if test="record.statisticstime != null">
+                statisticstime = #{record.statisticstime,jdbcType=DATE},
+            </if>
+            <if test="record.warningdate != null">
+                warningdate = #{record.warningdate,jdbcType=DATE},
+            </if>
+        </set>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByExample" parameterType="map">
+        update ABSENTCOURSEWARNING
+        set id = #{record.id,jdbcType=INTEGER},
+        warninglevelid = #{record.warninglevelid,jdbcType=INTEGER},
+        opencourseid = #{record.opencourseid,jdbcType=INTEGER},
+        studentid = #{record.studentid,jdbcType=INTEGER},
+        times = #{record.times,jdbcType=INTEGER},
+        statisticstime = #{record.statisticstime,jdbcType=DATE},
+        warningdate = #{record.warningdate,jdbcType=DATE}
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByPrimaryKeySelective" parameterType="cn.edu.nwsuaf.entity.Absentcoursewarning">
+        update ABSENTCOURSEWARNING
+        <set>
+            <if test="warninglevelid != null">
+                warninglevelid = #{warninglevelid,jdbcType=INTEGER},
+            </if>
+            <if test="opencourseid != null">
+                opencourseid = #{opencourseid,jdbcType=INTEGER},
+            </if>
+            <if test="studentid != null">
+                studentid = #{studentid,jdbcType=INTEGER},
+            </if>
+            <if test="times != null">
+                times = #{times,jdbcType=INTEGER},
+            </if>
+            <if test="statisticstime != null">
+                statisticstime = #{statisticstime,jdbcType=DATE},
+            </if>
+            <if test="warningdate != null">
+                warningdate = #{warningdate,jdbcType=DATE},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="cn.edu.nwsuaf.entity.Absentcoursewarning">
+    update ABSENTCOURSEWARNING
+    set warninglevelid = #{warninglevelid,jdbcType=INTEGER},
+      opencourseid = #{opencourseid,jdbcType=INTEGER},
+      studentid = #{studentid,jdbcType=INTEGER},
+      times = #{times,jdbcType=INTEGER},
+      statisticstime = #{statisticstime,jdbcType=DATE},
+      warningdate = #{warningdate,jdbcType=DATE}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

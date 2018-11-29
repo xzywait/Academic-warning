@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.edu.nwsuaf.mapper.BtOpencourseMapper">
+    <resultMap id="BaseResultMap" type="cn.edu.nwsuaf.entity.BtOpencourse">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="courseid" property="courseid" jdbcType="INTEGER"/>
+        <result column="opentypeid" property="opentypeid" jdbcType="INTEGER"/>
+        <result column="coursenatureid" property="coursenatureid" jdbcType="INTEGER"/>
+        <result column="semesterid" property="semesterid" jdbcType="INTEGER"/>
+        <result column="yearid" property="yearid" jdbcType="INTEGER"/>
+        <result column="teacherid" property="teacherid" jdbcType="INTEGER"/>
+        <result column="practicalhours" property="practicalhours" jdbcType="REAL"/>
+        <result column="totalhours" property="totalhours" jdbcType="REAL"/>
+        <result column="theoryhours" property="theoryhours" jdbcType="REAL"/>
+        <result column="experimentalhours" property="experimentalhours" jdbcType="REAL"/>
+    </resultMap>
+    <resultMap id="CourseTupleMap" type="cn.edu.nwsuaf.model.CourseTuple">
+        <result column="courseTotalNum" property="courseTotalNum" jdbcType="INTEGER"/>
+        <result column="courseTotalCredit" property="courseTotalCredit" jdbcType="INTEGER"/>
+    </resultMap>
+    <select id="selectByParmas" resultMap="BaseResultMap">
+        SELECT BT_OPENCOURSE.id
+        FROM BT_COURSE , BT_CLASSMERGING , BT_CLASS ,TEACHER ,BT_YEAR , BT_SEMESTER ,
+        BT_OPENCOURSE
+        WHERE BT_OPENCOURSE.courseid=BT_COURSE.id
+        AND BT_OPENCOURSE.yearid=BT_YEAR.id
+        AND BT_OPENCOURSE.semesterid=BT_SEMESTER.id
+        AND BT_CLASSMERGING.opencourseid=BT_OPENCOURSE.id
+        AND BT_CLASSMERGING.classid=BT_CLASS.id
+        AND BT_OPENCOURSE.teacherid=TEACHER.id
+        <if test="classid != null">
+            AND BT_CLASS.id=#{classid}
+        </if>
+        <if test="courseid != null">
+            AND BT_COURSE.id=#{courseid}
+        </if>
+        <if test="teacherid!=null">
+            AND TEACHER.id=#{teacherid}
+        </if>
+        ;
+    </select>
+    <select id="selectTotalNumAndCredit" resultMap="CourseTupleMap">
+        -- todo--------
+        -- 查询下某个学期开了几门课
+        -- 现在是7个关联表了,加上总学分有8个
+        SELECT count(*) as courseTotalNum, sum(credit) as courseTotalCredit
+        FROM BT_OPENCOURSE ,STUDENT ,BT_CLASS,BT_YEAR,BT_SEMESTER,BT_CLASSMERGING,BT_COURSE,BT_COURSENATURE
+        WHERE
+        STUDENT.classid=BT_CLASS.id
+        AND BT_OPENCOURSE.id=BT_CLASSMERGING.opencourseid
+        AND BT_OPENCOURSE.courseid=BT_COURSE.id
+        AND BT_CLASS.id=BT_CLASSMERGING.classid
+        AND BT_OPENCOURSE.yearid=BT_YEAR.id
+        AND BT_OPENCOURSE.semesterid=BT_SEMESTER.id
+        AND BT_OPENCOURSE.coursenatureid=BT_COURSENATURE.id
+        <if test="studentid != null">
+            AND STUDENT.id=#{studentid}
+        </if>
+        <if test="yearname != null">
+            AND BT_YEAR.yearname=#{yearname}
+        </if>
+        <if test="semestername != null">
+            AND BT_SEMESTER.semestername=#{semestername}
+        </if>
+        <if test="coursenaturename != null">
+            AND BT_COURSENATURE.coursenaturename=#{coursenaturename}
+        </if>;
+    </select>
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
+    id, courseid, opentypeid, coursenatureid, semesterid, yearid, teacherid, practicalhours, 
+    totalhours, theoryhours, experimentalhours
+  </sql>
+    <select id="selectByExample" resultMap="BaseResultMap" parameterType="cn.edu.nwsuaf.entity.BtOpencourseExample">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List"/>
+        from BT_OPENCOURSE
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from BT_OPENCOURSE
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from BT_OPENCOURSE
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+    <delete id="deleteByExample" parameterType="cn.edu.nwsuaf.entity.BtOpencourseExample">
+        delete from BT_OPENCOURSE
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </delete>
+    <insert id="insert" parameterType="cn.edu.nwsuaf.entity.BtOpencourse">
+    insert into BT_OPENCOURSE (id, courseid, opentypeid, 
+      coursenatureid, semesterid, yearid, 
+      teacherid, practicalhours, totalhours, 
+      theoryhours, experimentalhours)
+    values (#{id,jdbcType=INTEGER}, #{courseid,jdbcType=INTEGER}, #{opentypeid,jdbcType=INTEGER}, 
+      #{coursenatureid,jdbcType=INTEGER}, #{semesterid,jdbcType=INTEGER}, #{yearid,jdbcType=INTEGER}, 
+      #{teacherid,jdbcType=INTEGER}, #{practicalhours,jdbcType=REAL}, #{totalhours,jdbcType=REAL}, 
+      #{theoryhours,jdbcType=REAL}, #{experimentalhours,jdbcType=REAL})
+  </insert>
+    <insert id="insertSelective" parameterType="cn.edu.nwsuaf.entity.BtOpencourse">
+        insert into BT_OPENCOURSE
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="courseid != null">
+                courseid,
+            </if>
+            <if test="opentypeid != null">
+                opentypeid,
+            </if>
+            <if test="coursenatureid != null">
+                coursenatureid,
+            </if>
+            <if test="semesterid != null">
+                semesterid,
+            </if>
+            <if test="yearid != null">
+                yearid,
+            </if>
+            <if test="teacherid != null">
+                teacherid,
+            </if>
+            <if test="practicalhours != null">
+                practicalhours,
+            </if>
+            <if test="totalhours != null">
+                totalhours,
+            </if>
+            <if test="theoryhours != null">
+                theoryhours,
+            </if>
+            <if test="experimentalhours != null">
+                experimentalhours,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="courseid != null">
+                #{courseid,jdbcType=INTEGER},
+            </if>
+            <if test="opentypeid != null">
+                #{opentypeid,jdbcType=INTEGER},
+            </if>
+            <if test="coursenatureid != null">
+                #{coursenatureid,jdbcType=INTEGER},
+            </if>
+            <if test="semesterid != null">
+                #{semesterid,jdbcType=INTEGER},
+            </if>
+            <if test="yearid != null">
+                #{yearid,jdbcType=INTEGER},
+            </if>
+            <if test="teacherid != null">
+                #{teacherid,jdbcType=INTEGER},
+            </if>
+            <if test="practicalhours != null">
+                #{practicalhours,jdbcType=REAL},
+            </if>
+            <if test="totalhours != null">
+                #{totalhours,jdbcType=REAL},
+            </if>
+            <if test="theoryhours != null">
+                #{theoryhours,jdbcType=REAL},
+            </if>
+            <if test="experimentalhours != null">
+                #{experimentalhours,jdbcType=REAL},
+            </if>
+        </trim>
+    </insert>
+    <select id="countByExample" parameterType="cn.edu.nwsuaf.entity.BtOpencourseExample" resultType="java.lang.Integer">
+        select count(*) from BT_OPENCOURSE
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </select>
+    <update id="updateByExampleSelective" parameterType="map">
+        update BT_OPENCOURSE
+        <set>
+            <if test="record.id != null">
+                id = #{record.id,jdbcType=INTEGER},
+            </if>
+            <if test="record.courseid != null">
+                courseid = #{record.courseid,jdbcType=INTEGER},
+            </if>
+            <if test="record.opentypeid != null">
+                opentypeid = #{record.opentypeid,jdbcType=INTEGER},
+            </if>
+            <if test="record.coursenatureid != null">
+                coursenatureid = #{record.coursenatureid,jdbcType=INTEGER},
+            </if>
+            <if test="record.semesterid != null">
+                semesterid = #{record.semesterid,jdbcType=INTEGER},
+            </if>
+            <if test="record.yearid != null">
+                yearid = #{record.yearid,jdbcType=INTEGER},
+            </if>
+            <if test="record.teacherid != null">
+                teacherid = #{record.teacherid,jdbcType=INTEGER},
+            </if>
+            <if test="record.practicalhours != null">
+                practicalhours = #{record.practicalhours,jdbcType=REAL},
+            </if>
+            <if test="record.totalhours != null">
+                totalhours = #{record.totalhours,jdbcType=REAL},
+            </if>
+            <if test="record.theoryhours != null">
+                theoryhours = #{record.theoryhours,jdbcType=REAL},
+            </if>
+            <if test="record.experimentalhours != null">
+                experimentalhours = #{record.experimentalhours,jdbcType=REAL},
+            </if>
+        </set>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByExample" parameterType="map">
+        update BT_OPENCOURSE
+        set id = #{record.id,jdbcType=INTEGER},
+        courseid = #{record.courseid,jdbcType=INTEGER},
+        opentypeid = #{record.opentypeid,jdbcType=INTEGER},
+        coursenatureid = #{record.coursenatureid,jdbcType=INTEGER},
+        semesterid = #{record.semesterid,jdbcType=INTEGER},
+        yearid = #{record.yearid,jdbcType=INTEGER},
+        teacherid = #{record.teacherid,jdbcType=INTEGER},
+        practicalhours = #{record.practicalhours,jdbcType=REAL},
+        totalhours = #{record.totalhours,jdbcType=REAL},
+        theoryhours = #{record.theoryhours,jdbcType=REAL},
+        experimentalhours = #{record.experimentalhours,jdbcType=REAL}
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByPrimaryKeySelective" parameterType="cn.edu.nwsuaf.entity.BtOpencourse">
+        update BT_OPENCOURSE
+        <set>
+            <if test="courseid != null">
+                courseid = #{courseid,jdbcType=INTEGER},
+            </if>
+            <if test="opentypeid != null">
+                opentypeid = #{opentypeid,jdbcType=INTEGER},
+            </if>
+            <if test="coursenatureid != null">
+                coursenatureid = #{coursenatureid,jdbcType=INTEGER},
+            </if>
+            <if test="semesterid != null">
+                semesterid = #{semesterid,jdbcType=INTEGER},
+            </if>
+            <if test="yearid != null">
+                yearid = #{yearid,jdbcType=INTEGER},
+            </if>
+            <if test="teacherid != null">
+                teacherid = #{teacherid,jdbcType=INTEGER},
+            </if>
+            <if test="practicalhours != null">
+                practicalhours = #{practicalhours,jdbcType=REAL},
+            </if>
+            <if test="totalhours != null">
+                totalhours = #{totalhours,jdbcType=REAL},
+            </if>
+            <if test="theoryhours != null">
+                theoryhours = #{theoryhours,jdbcType=REAL},
+            </if>
+            <if test="experimentalhours != null">
+                experimentalhours = #{experimentalhours,jdbcType=REAL},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="cn.edu.nwsuaf.entity.BtOpencourse">
+    update BT_OPENCOURSE
+    set courseid = #{courseid,jdbcType=INTEGER},
+      opentypeid = #{opentypeid,jdbcType=INTEGER},
+      coursenatureid = #{coursenatureid,jdbcType=INTEGER},
+      semesterid = #{semesterid,jdbcType=INTEGER},
+      yearid = #{yearid,jdbcType=INTEGER},
+      teacherid = #{teacherid,jdbcType=INTEGER},
+      practicalhours = #{practicalhours,jdbcType=REAL},
+      totalhours = #{totalhours,jdbcType=REAL},
+      theoryhours = #{theoryhours,jdbcType=REAL},
+      experimentalhours = #{experimentalhours,jdbcType=REAL}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

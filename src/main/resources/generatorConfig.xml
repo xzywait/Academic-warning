@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE generatorConfiguration PUBLIC
+        "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd" >
+<generatorConfiguration>
+
+    <properties resource="config.properties"/>
+    <!-- !!!! Driver Class Path !!!! -->
+    <classPathEntry location="${classPath}"/>
+    <!--一个数据库一个context-->
+    <context id="context" targetRuntime="MyBatis3">
+        <!--注释-->
+        <commentGenerator>
+            <!--是否取消注释-->
+            <property name="suppressAllComments" value="true"/>
+            <!--是否生成注释代时间戳-->
+            <property name="suppressDate" value="false"/>
+        </commentGenerator>
+
+        <!-- !!!! Database Configurations !!!! -->
+        <jdbcConnection driverClass="${jdbc.driver}" connectionURL="${jdbc.url}" userId="${jdbc.username}"
+                        password="${jdbc.password}"/>
+        <!--类型转换-->
+        <javaTypeResolver>
+            <property name="forceBigDecimals" value="false"/>
+        </javaTypeResolver>
+
+        <!-- !!!! Model Configurations !!!! -->
+        <!--生成实体类文件-->
+        <javaModelGenerator targetPackage="cn.edu.nwsuaf.entity" targetProject="${project}">
+            <!-- 是否在当前路径下新加一层schema,eg：fase路径com.oop.eksp.user.model， true:com.oop.eksp.user.model.[schemaName] -->
+            <property name="enableSubPackages" value="false"/>
+            <property name="trimStrings" value="true"/>
+        </javaModelGenerator>
+
+        <!-- !!!! Mapper XML Configurations !!!! -->
+        <!--生成mapxml文件-->
+        <sqlMapGenerator targetPackage="cn.edu.nwsuaf.entity.xml" targetProject="${project}">
+            <property name="enableSubPackages" value="false"/>
+        </sqlMapGenerator>
+
+        <!-- !!!! Mapper Interface Configurations !!!! -->
+        <!--生成mapXML对应的client，也就是接口dao-->
+        <javaClientGenerator targetPackage="cn.edu.nwsuaf.mapper" targetProject="${project}" type="XMLMAPPER">
+            <property name="enableSubPackages" value="false"/>
+        </javaClientGenerator>
+
+        <!-- !!!! Table Configurations !!!! -->
+        <table tableName="%" schema="warning" enableCountByExample="true" enableDeleteByExample="true"
+               enableSelectByExample="true"
+               enableUpdateByExample="true">
+
+        </table>
+    </context>
+</generatorConfiguration>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration PUBLIC "-//LOGGER" "log4j.dtd">
+
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+
+    <!-- Appenders -->
+    <appender name="console" class="org.apache.log4j.ConsoleAppender">
+        <param name="Target" value="System.out"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <!--<param name="ConversionPattern" value="%-5p: %c - %m%n" />-->
+            <!--<param name="ConversionPattern" value="[%d{MMdd HH:mm:ss SSS} %-5p] [%t] %c{3} - %m%n" />-->
+            <param name="ConversionPattern" value="[%d{yyyy-MM-dd HH:mm:ss\} %-5p] [%t] {%c:%L}-%m%n"/>
+        </layout>
+    </appender>
+
+    <!-- 3rdparty Loggers -->
+    <!--<logger name="org.springframework.core">-->
+    <!--<level value="INFO" />-->
+    <!--</logger>-->
+
+    <!--<logger name="org.springframework.beans">-->
+    <!--<level value="INFO" />-->
+    <!--</logger>-->
+
+    <!--<logger name="org.springframework.context">-->
+    <!--<level value="INFO" />-->
+    <!--</logger>-->
+
+    <!--<logger name="org.springframework.web">-->
+    <!--<level value="INFO" />-->
+    <!--</logger>-->
+
+    <!-- mybatis log -->
+    <logger name="java.sql.Connection">
+        <level value="INFO"/>
+    </logger>
+    <logger name="java.sql.PreparedStatement">
+        <level value="INFO"/>
+    </logger>
+
+    <logger name="cn.edu.nwsuaf">
+        <level value="DEBUG"/>
+    </logger>
+
+    <logger name="com.isea533.mybatis.mapper">
+        <level value="DEBUG"/>
+    </logger>
+
+    <!-- Root Logger -->
+    <root>
+        <priority value="WARN"/>
+        <appender-ref ref="console"/>
+    </root>
+
+</log4j:configuration>

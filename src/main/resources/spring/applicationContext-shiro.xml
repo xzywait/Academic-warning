@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!--shiro安全配置-->
+    <!--<description>Shiro安全配置   来源于： http://shiro.apache.org/spring.html </description>-->
+    <!--配置securityManager实例：管理shiro相关换成操作-->
+    <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+        <property name="realm" ref="shiroDbRealm"/>
+    </bean>
+    <!--配置realm实例，实际的认证和授权都是由realm实例来完成-->
+    <bean id="shiroDbRealm" class="cn.edu.nwsuaf.shiro.ShiroDbRealm"/>
+    <!--配置那些页面需要被拦截，以及访问这些页面所需要的权限-->
+    <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+        <property name="securityManager" ref="securityManager"/>
+        <property name="loginUrl" value="/login_loginPage.do"/> <!-- 没有权限或者失败后跳转的页面 -->
+        <property name="successUrl" value="/login_home.do"/>
+        <property name="unauthorizedUrl" value="/other_error.do"/>
+        <property name="filterChainDefinitions">
+            <value>
+
+                /login_loginPage.do = anon
+
+                /login_login.do = anon
+                /login_home.do=authc
+                /login_hello.do=authc
+
+                /t1/**=roles[aa],perms[aaa]
+                /t2/**=roles[bb],perms[baaa]
+                /t3/**=roles[dd]
+
+            </value>
+        </property>
+    </bean>
+
+    <!-- 配置bean的后置处理器来自动调用Shiro中的bean的init和destroy方法，
+                保证实现了Shiro内部lifecycle函数的bean执行 -->
+    <bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor"/>
+
+
+    <!-- 使用注解注入properties中的值 -->
+    <!--<bean id="geoserverParam"-->
+    <!--class="org.springframework.beans.factory.config.PropertiesFactoryBean">-->
+    <!--<property name="locations">-->
+    <!--<list>-->
+    <!--<value>classpath:geoserver.properties</value>-->
+    <!--</list>-->
+    <!--</property>-->
+    <!--&lt;!&ndash; 设置编码格式 &ndash;&gt;-->
+    <!--<property name="fileEncoding" value="UTF-8"></property>-->
+    <!--</bean>-->
+</beans>

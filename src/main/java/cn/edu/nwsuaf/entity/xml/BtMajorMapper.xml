@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.edu.nwsuaf.mapper.BtMajorMapper">
+    <resultMap id="BaseResultMap" type="cn.edu.nwsuaf.entity.BtMajor">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="departmentid" property="departmentid" jdbcType="INTEGER"/>
+        <result column="majorno" property="majorno" jdbcType="VARCHAR"/>
+        <result column="majorname" property="majorname" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
+    id, departmentid, majorno, majorname
+  </sql>
+    <select id="selectByExample" resultMap="BaseResultMap" parameterType="cn.edu.nwsuaf.entity.BtMajorExample">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List"/>
+        from BT_MAJOR
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from BT_MAJOR
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from BT_MAJOR
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+    <delete id="deleteByExample" parameterType="cn.edu.nwsuaf.entity.BtMajorExample">
+        delete from BT_MAJOR
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </delete>
+    <insert id="insert" parameterType="cn.edu.nwsuaf.entity.BtMajor">
+    insert into BT_MAJOR (id, departmentid, majorno, 
+      majorname)
+    values (#{id,jdbcType=INTEGER}, #{departmentid,jdbcType=INTEGER}, #{majorno,jdbcType=VARCHAR}, 
+      #{majorname,jdbcType=VARCHAR})
+  </insert>
+    <insert id="insertSelective" parameterType="cn.edu.nwsuaf.entity.BtMajor">
+        insert into BT_MAJOR
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="departmentid != null">
+                departmentid,
+            </if>
+            <if test="majorno != null">
+                majorno,
+            </if>
+            <if test="majorname != null">
+                majorname,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="departmentid != null">
+                #{departmentid,jdbcType=INTEGER},
+            </if>
+            <if test="majorno != null">
+                #{majorno,jdbcType=VARCHAR},
+            </if>
+            <if test="majorname != null">
+                #{majorname,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <select id="countByExample" parameterType="cn.edu.nwsuaf.entity.BtMajorExample" resultType="java.lang.Integer">
+        select count(*) from BT_MAJOR
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </select>
+    <update id="updateByExampleSelective" parameterType="map">
+        update BT_MAJOR
+        <set>
+            <if test="record.id != null">
+                id = #{record.id,jdbcType=INTEGER},
+            </if>
+            <if test="record.departmentid != null">
+                departmentid = #{record.departmentid,jdbcType=INTEGER},
+            </if>
+            <if test="record.majorno != null">
+                majorno = #{record.majorno,jdbcType=VARCHAR},
+            </if>
+            <if test="record.majorname != null">
+                majorname = #{record.majorname,jdbcType=VARCHAR},
+            </if>
+        </set>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByExample" parameterType="map">
+        update BT_MAJOR
+        set id = #{record.id,jdbcType=INTEGER},
+        departmentid = #{record.departmentid,jdbcType=INTEGER},
+        majorno = #{record.majorno,jdbcType=VARCHAR},
+        majorname = #{record.majorname,jdbcType=VARCHAR}
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByPrimaryKeySelective" parameterType="cn.edu.nwsuaf.entity.BtMajor">
+        update BT_MAJOR
+        <set>
+            <if test="departmentid != null">
+                departmentid = #{departmentid,jdbcType=INTEGER},
+            </if>
+            <if test="majorno != null">
+                majorno = #{majorno,jdbcType=VARCHAR},
+            </if>
+            <if test="majorname != null">
+                majorname = #{majorname,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="cn.edu.nwsuaf.entity.BtMajor">
+    update BT_MAJOR
+    set departmentid = #{departmentid,jdbcType=INTEGER},
+      majorno = #{majorno,jdbcType=VARCHAR},
+      majorname = #{majorname,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

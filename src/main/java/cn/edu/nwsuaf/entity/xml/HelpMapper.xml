@@ -1,0 +1,461 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.edu.nwsuaf.mapper.HelpMapper">
+    <resultMap id="BaseResultMap" type="cn.edu.nwsuaf.entity.Help">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="yearid" property="yearid" jdbcType="INTEGER"/>
+        <result column="semesterid" property="semesterid" jdbcType="INTEGER"/>
+        <result column="studentwarningid" property="studentwarningid" jdbcType="INTEGER"/>
+        <result column="studentid" property="studentid" jdbcType="INTEGER"/>
+        <result column="userid" property="userid" jdbcType="INTEGER"/>
+        <result column="helpresult" property="helpresult" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="BIT"/>
+    </resultMap>
+    <resultMap id="ResultMapWithBLOBs" type="cn.edu.nwsuaf.entity.Help" extends="BaseResultMap">
+        <result column="helpplan" property="helpplan" jdbcType="LONGVARCHAR"/>
+    </resultMap>
+    <resultMap id="HelpModelMap" type="cn.edu.nwsuaf.model.HelpModel">
+        <result column="helpid" property="helpid" jdbcType="INTEGER"/>
+        <result column="helppeoplename" property="helppeoplename" jdbcType="VARCHAR"/>
+        <result column="warningtypename" property="warningtypename" jdbcType="VARCHAR"/>
+        <result column="warninglevelname" property="warninglevelname" jdbcType="VARCHAR"/>
+        <result column="helpplan" property="helpplan" jdbcType="VARCHAR"/>
+        <result column="helpresult" property="helpresult" jdbcType="VARCHAR"/>
+    </resultMap>
+    <resultMap id="HelpDetailModelMap" type="cn.edu.nwsuaf.model.HelpDetailModel">
+        <result column="helppeoplename" property="helppeoplename" jdbcType="VARCHAR"/>
+        <result column="warningtypename" property="warningtypename" jdbcType="VARCHAR"/>
+        <result column="warninglevelname" property="warninglevelname" jdbcType="VARCHAR"/>
+        <result column="helpplan" property="helpplan" jdbcType="VARCHAR"/>
+        <result column="measures" property="measures" jdbcType="VARCHAR"/>
+        <result column="yearname" property="yearname" jdbcType="VARCHAR"/>
+        <result column="semestername" property="semestername" jdbcType="VARCHAR"/>
+        <result column="helpplace" property="helpplace" jdbcType="VARCHAR"/>
+        <result column="helpresult" property="helpresult" jdbcType="VARCHAR"/>
+    </resultMap>
+    <resultMap id="HelpSummaryModelMap" type="cn.edu.nwsuaf.model.HelpSummaryModel">
+        <result column="id" property="helpSummaryId" jdbcType="INTEGER"/>
+        <result column="warningtypename" property="warningtypename" jdbcType="VARCHAR"/>
+        <result column="warninglevelname" property="warninglevelname" jdbcType="VARCHAR"/>
+        <result column="summarydate" property="summarydate" jdbcType="DATE"/>
+        <result column="yearname" property="yearname" jdbcType="VARCHAR"/>
+        <result column="semestername" property="semestername" jdbcType="VARCHAR"/>
+    </resultMap>
+    <resultMap id="HelpSummaryDetailModelMap" type="cn.edu.nwsuaf.model.HelpSummaryDetailModel">
+        <result column="helppeoplename" property="helppeoplename" jdbcType="VARCHAR"/>
+        <result column="warningtypename" property="warningtypename" jdbcType="VARCHAR"/>
+        <result column="warninglevelname" property="warninglevelname" jdbcType="VARCHAR"/>
+        <result column="yearname" property="yearname" jdbcType="VARCHAR"/>
+        <result column="semestername" property="semestername" jdbcType="VARCHAR"/>
+        <result column="helpprocess" property="helpprocess" jdbcType="VARCHAR"/>
+        <result column="helpresult" property="helpresult" jdbcType="VARCHAR"/>
+        <result column="helpsummary" property="helpsummary" jdbcType="VARCHAR"/>
+    </resultMap>
+    <select id="getHelpModelByStudentId" resultMap="HelpModelMap">
+        SELECT HELP.id as helpid ,case SYSUSERINFO.roleid when 1 THEN STUDENT.studentname when 2 THEN
+        TEACHER.teachername END as
+        helppeoplename,WARNINGTYPE.warningtypename,WARNINGLEVEL.warninglevelname,HELP.helpplan,HELP.helpresult
+        FROM HELP,STUDENT,STUDENTWARNING,WARNINGLEVEL,WARNINGTYPE,SYSUSERINFO,BT_YEAR,BT_SEMESTER,TEACHER
+        WHERE HELP.studentwarningid=STUDENTWARNING.id
+        AND HELP.yearid=BT_YEAR.id
+        AND HELP.semesterid=BT_SEMESTER.id
+        AND HELP.studentid=STUDENT.id
+        AND HELP.studentid=STUDENTWARNING.studentid
+        AND SYSUSERINFO.id=HELP.userid
+        AND STUDENTWARNING.studentid=STUDENT.id
+        AND STUDENTWARNING.warningtypeid=WARNINGTYPE.id
+        AND STUDENTWARNING.warninglevelid=WARNINGLEVEL.id
+        AND BT_YEAR.id=STUDENTWARNING.yearid
+        AND BT_SEMESTER.id=STUDENTWARNING.semesterid
+        AND (HELP.userid=STUDENT.id or HELP.userid=TEACHER.id)
+        <if test="studentid != null">
+            AND STUDENT.id=#{studentid}
+        </if>
+        ;
+    </select>
+    <select id="getHelpDetailModelByStudentId" resultMap="HelpDetailModelMap">
+        SELECT case SYSUSERINFO.roleid when 1 THEN STUDENT.studentname when 2 THEN TEACHER.teachername END as
+        helppeoplename,
+        WARNINGTYPE.warningtypename,WARNINGLEVEL.warninglevelname,HELP.helpplan,HELPPROCESS.measures,
+        BT_YEAR.yearname,BT_SEMESTER.semestername,HELPPROCESS.helpplace,HELP.helpresult
+        FROM
+        HELP,STUDENT,STUDENTWARNING,WARNINGLEVEL,WARNINGTYPE,SYSUSERINFO,BT_YEAR,BT_SEMESTER,TEACHER,HELPPROCESS,BT_HELPFORM
+        WHERE HELP.studentwarningid=STUDENTWARNING.id
+        AND HELP.yearid=BT_YEAR.id
+        AND HELP.semesterid=BT_SEMESTER.id
+        AND HELP.studentid=STUDENT.id
+        AND HELP.studentid=STUDENTWARNING.studentid
+        AND SYSUSERINFO.id=HELP.userid
+        AND STUDENTWARNING.studentid=STUDENT.id
+        AND STUDENTWARNING.warningtypeid=WARNINGTYPE.id
+        AND STUDENTWARNING.warninglevelid=WARNINGLEVEL.id
+        AND BT_YEAR.id=STUDENTWARNING.yearid
+        AND BT_SEMESTER.id=STUDENTWARNING.semesterid
+        AND HELPPROCESS.helpid=HELP.id
+        AND HELPPROCESS.helpformid=BT_HELPFORM.id
+        AND (HELP.userid=STUDENT.id or HELP.userid=TEACHER.id)
+        <if test="studentid != null">
+            AND STUDENT.id=#{studentid}
+        </if>
+        <if test="helpid != null">
+            AND HELP.id=#{helpid}
+        </if>
+        ;
+    </select>
+    <select id="getHelpSummaryModelByStudentId" resultMap="HelpSummaryModelMap">
+        SELECT HELPSUMMARY.id,
+        WARNINGTYPE.warningtypename,WARNINGLEVEL.warninglevelname,HELPSUMMARY.summarydate,BT_YEAR.yearname,BT_SEMESTER.semestername
+        FROM HELP,STUDENT,STUDENTWARNING,WARNINGLEVEL,WARNINGTYPE,BT_YEAR,BT_SEMESTER,HELPSUMMARY
+        WHERE HELP.studentwarningid=STUDENTWARNING.id
+        AND HELPSUMMARY.helpid=HELP.id
+        AND HELP.yearid=BT_YEAR.id
+        AND HELP.semesterid=BT_SEMESTER.id
+        AND HELP.studentid=STUDENT.id
+        AND HELP.studentid=STUDENTWARNING.studentid
+        AND STUDENTWARNING.studentid=STUDENT.id
+        AND STUDENTWARNING.warningtypeid=WARNINGTYPE.id
+        AND STUDENTWARNING.warninglevelid=WARNINGLEVEL.id
+        AND BT_YEAR.id=STUDENTWARNING.yearid
+        AND BT_SEMESTER.id=STUDENTWARNING.semesterid
+        <if test="studentid != null">
+            AND STUDENT.id=#{studentid}
+        </if>
+        ;
+    </select>
+    <select id="getHelpSummaryDetailModelByStudentId" resultMap="HelpSummaryDetailModelMap">
+        SELECT case SYSUSERINFO.roleid when 1 THEN STUDENT.studentname when 2 THEN TEACHER.teachername END as
+        helppeoplename,WARNINGTYPE.warningtypename,
+        WARNINGLEVEL.warninglevelname,BT_YEAR.yearname,BT_SEMESTER.semestername,HELPSUMMARY.helpprocess,HELPSUMMARY.helpresult,HELPSUMMARY.helpsummary
+        FROM HELP,STUDENT,STUDENTWARNING,WARNINGLEVEL,WARNINGTYPE,SYSUSERINFO,BT_YEAR,BT_SEMESTER,TEACHER,HELPSUMMARY
+        WHERE HELP.studentwarningid=STUDENTWARNING.id
+        AND HELP.yearid=BT_YEAR.id
+        AND HELP.semesterid=BT_SEMESTER.id
+        AND HELP.studentid=STUDENT.id
+        AND HELP.studentid=STUDENTWARNING.studentid
+        AND SYSUSERINFO.id=HELP.userid
+        AND STUDENTWARNING.studentid=STUDENT.id
+        AND STUDENTWARNING.warningtypeid=WARNINGTYPE.id
+        AND STUDENTWARNING.warninglevelid=WARNINGLEVEL.id
+        AND BT_YEAR.id=STUDENTWARNING.yearid
+        AND BT_SEMESTER.id=STUDENTWARNING.semesterid
+        AND HELPSUMMARY.helpid=HELP.id
+        AND (HELP.userid=STUDENT.id or HELP.userid=TEACHER.id)
+        <if test="studentid != null">
+            AND STUDENT.id=#{studentid}
+        </if>
+        <if test="helpsummaryid != null">
+            AND HELPSUMMARY.id=#{helpsummaryid}
+        </if>
+        ;
+
+    </select>
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
+    id, yearid, semesterid, studentwarningid, studentid, userid, helpresult, status
+  </sql>
+    <sql id="Blob_Column_List">
+    helpplan
+  </sql>
+    <select id="selectByExampleWithBLOBs" resultMap="ResultMapWithBLOBs"
+            parameterType="cn.edu.nwsuaf.entity.HelpExample">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List"/>
+        ,
+        <include refid="Blob_Column_List"/>
+        from HELP
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+    <select id="selectByExample" resultMap="BaseResultMap" parameterType="cn.edu.nwsuaf.entity.HelpExample">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List"/>
+        from HELP
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+    <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        ,
+        <include refid="Blob_Column_List"/>
+        from HELP
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from HELP
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+    <delete id="deleteByExample" parameterType="cn.edu.nwsuaf.entity.HelpExample">
+        delete from HELP
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </delete>
+    <insert id="insert" parameterType="cn.edu.nwsuaf.entity.Help">
+    insert into HELP (id, yearid, semesterid, 
+      studentwarningid, studentid, userid, 
+      helpresult, status, helpplan
+      )
+    values (#{id,jdbcType=INTEGER}, #{yearid,jdbcType=INTEGER}, #{semesterid,jdbcType=INTEGER}, 
+      #{studentwarningid,jdbcType=INTEGER}, #{studentid,jdbcType=INTEGER}, #{userid,jdbcType=INTEGER}, 
+      #{helpresult,jdbcType=VARCHAR}, #{status,jdbcType=BIT}, #{helpplan,jdbcType=LONGVARCHAR}
+      )
+  </insert>
+    <insert id="insertSelective" parameterType="cn.edu.nwsuaf.entity.Help">
+        insert into HELP
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="yearid != null">
+                yearid,
+            </if>
+            <if test="semesterid != null">
+                semesterid,
+            </if>
+            <if test="studentwarningid != null">
+                studentwarningid,
+            </if>
+            <if test="studentid != null">
+                studentid,
+            </if>
+            <if test="userid != null">
+                userid,
+            </if>
+            <if test="helpresult != null">
+                helpresult,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="helpplan != null">
+                helpplan,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="yearid != null">
+                #{yearid,jdbcType=INTEGER},
+            </if>
+            <if test="semesterid != null">
+                #{semesterid,jdbcType=INTEGER},
+            </if>
+            <if test="studentwarningid != null">
+                #{studentwarningid,jdbcType=INTEGER},
+            </if>
+            <if test="studentid != null">
+                #{studentid,jdbcType=INTEGER},
+            </if>
+            <if test="userid != null">
+                #{userid,jdbcType=INTEGER},
+            </if>
+            <if test="helpresult != null">
+                #{helpresult,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=BIT},
+            </if>
+            <if test="helpplan != null">
+                #{helpplan,jdbcType=LONGVARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <select id="countByExample" parameterType="cn.edu.nwsuaf.entity.HelpExample" resultType="java.lang.Integer">
+        select count(*) from HELP
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </select>
+    <update id="updateByExampleSelective" parameterType="map">
+        update HELP
+        <set>
+            <if test="record.id != null">
+                id = #{record.id,jdbcType=INTEGER},
+            </if>
+            <if test="record.yearid != null">
+                yearid = #{record.yearid,jdbcType=INTEGER},
+            </if>
+            <if test="record.semesterid != null">
+                semesterid = #{record.semesterid,jdbcType=INTEGER},
+            </if>
+            <if test="record.studentwarningid != null">
+                studentwarningid = #{record.studentwarningid,jdbcType=INTEGER},
+            </if>
+            <if test="record.studentid != null">
+                studentid = #{record.studentid,jdbcType=INTEGER},
+            </if>
+            <if test="record.userid != null">
+                userid = #{record.userid,jdbcType=INTEGER},
+            </if>
+            <if test="record.helpresult != null">
+                helpresult = #{record.helpresult,jdbcType=VARCHAR},
+            </if>
+            <if test="record.status != null">
+                status = #{record.status,jdbcType=BIT},
+            </if>
+            <if test="record.helpplan != null">
+                helpplan = #{record.helpplan,jdbcType=LONGVARCHAR},
+            </if>
+        </set>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByExampleWithBLOBs" parameterType="map">
+        update HELP
+        set id = #{record.id,jdbcType=INTEGER},
+        yearid = #{record.yearid,jdbcType=INTEGER},
+        semesterid = #{record.semesterid,jdbcType=INTEGER},
+        studentwarningid = #{record.studentwarningid,jdbcType=INTEGER},
+        studentid = #{record.studentid,jdbcType=INTEGER},
+        userid = #{record.userid,jdbcType=INTEGER},
+        helpresult = #{record.helpresult,jdbcType=VARCHAR},
+        status = #{record.status,jdbcType=BIT},
+        helpplan = #{record.helpplan,jdbcType=LONGVARCHAR}
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByExample" parameterType="map">
+        update HELP
+        set id = #{record.id,jdbcType=INTEGER},
+        yearid = #{record.yearid,jdbcType=INTEGER},
+        semesterid = #{record.semesterid,jdbcType=INTEGER},
+        studentwarningid = #{record.studentwarningid,jdbcType=INTEGER},
+        studentid = #{record.studentid,jdbcType=INTEGER},
+        userid = #{record.userid,jdbcType=INTEGER},
+        helpresult = #{record.helpresult,jdbcType=VARCHAR},
+        status = #{record.status,jdbcType=BIT}
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByPrimaryKeySelective" parameterType="cn.edu.nwsuaf.entity.Help">
+        update HELP
+        <set>
+            <if test="yearid != null">
+                yearid = #{yearid,jdbcType=INTEGER},
+            </if>
+            <if test="semesterid != null">
+                semesterid = #{semesterid,jdbcType=INTEGER},
+            </if>
+            <if test="studentwarningid != null">
+                studentwarningid = #{studentwarningid,jdbcType=INTEGER},
+            </if>
+            <if test="studentid != null">
+                studentid = #{studentid,jdbcType=INTEGER},
+            </if>
+            <if test="userid != null">
+                userid = #{userid,jdbcType=INTEGER},
+            </if>
+            <if test="helpresult != null">
+                helpresult = #{helpresult,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=BIT},
+            </if>
+            <if test="helpplan != null">
+                helpplan = #{helpplan,jdbcType=LONGVARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKeyWithBLOBs" parameterType="cn.edu.nwsuaf.entity.Help">
+    update HELP
+    set yearid = #{yearid,jdbcType=INTEGER},
+      semesterid = #{semesterid,jdbcType=INTEGER},
+      studentwarningid = #{studentwarningid,jdbcType=INTEGER},
+      studentid = #{studentid,jdbcType=INTEGER},
+      userid = #{userid,jdbcType=INTEGER},
+      helpresult = #{helpresult,jdbcType=VARCHAR},
+      status = #{status,jdbcType=BIT},
+      helpplan = #{helpplan,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+    <update id="updateByPrimaryKey" parameterType="cn.edu.nwsuaf.entity.Help">
+    update HELP
+    set yearid = #{yearid,jdbcType=INTEGER},
+      semesterid = #{semesterid,jdbcType=INTEGER},
+      studentwarningid = #{studentwarningid,jdbcType=INTEGER},
+      studentid = #{studentid,jdbcType=INTEGER},
+      userid = #{userid,jdbcType=INTEGER},
+      helpresult = #{helpresult,jdbcType=VARCHAR},
+      status = #{status,jdbcType=BIT}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.edu.nwsuaf.mapper.TeacherMapper">
+    <resultMap id="BaseResultMap" type="cn.edu.nwsuaf.entity.Teacher">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="departmentid" property="departmentid" jdbcType="INTEGER"/>
+        <result column="userid" property="userid" jdbcType="INTEGER"/>
+        <result column="teacherno" property="teacherno" jdbcType="VARCHAR"/>
+        <result column="teachername" property="teachername" jdbcType="VARCHAR"/>
+        <result column="telephone" property="telephone" jdbcType="VARCHAR"/>
+        <result column="email" property="email" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="BIT"/>
+    </resultMap>
+    <resultMap id="StudentMap" type="cn.edu.nwsuaf.entity.Student">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="userid" jdbcType="INTEGER" property="userid"/>
+        <result column="gradeid" jdbcType="INTEGER" property="gradeid"/>
+        <result column="classid" jdbcType="INTEGER" property="classid"/>
+        <result column="studentnumber" jdbcType="VARCHAR" property="studentnumber"/>
+        <result column="studentname" jdbcType="VARCHAR" property="studentname"/>
+        <result column="sex" jdbcType="VARCHAR" property="sex"/>
+        <result column="graduationdate" jdbcType="DATE" property="graduationdate"/>
+        <result column="telephone" jdbcType="VARCHAR" property="telephone"/>
+        <result column="email" jdbcType="VARCHAR" property="email"/>
+        <result column="isroll" jdbcType="BIT" property="isroll"/>
+        <result column="isinschool" jdbcType="BIT" property="isinschool"/>
+        <result column="status" jdbcType="TINYINT" property="status"/>
+        <result column="qq" jdbcType="VARCHAR" property="qq"/>
+    </resultMap>
+    <select id="selectwarningstudentbyclassid" resultMap="StudentMap">
+        SELECT DISTINCT STUDENT.* FROM
+        STUDENT , STUDENTWARNING
+        WHERE
+        STUDENT.id=STUDENTWARNING.studentid
+        <if test="classid != null">
+            AND STUDENT.classid=#{classid}
+        </if>
+        <if test="studentname != null">
+            AND STUDENT.studentname=#{studentname}
+        </if>;
+    </select>
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
+    id, departmentid, userid, teacherno, teachername, telephone, email, status
+  </sql>
+    <select id="selectByExample" resultMap="BaseResultMap" parameterType="cn.edu.nwsuaf.entity.TeacherExample">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List"/>
+        from TEACHER
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from TEACHER
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from TEACHER
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+    <delete id="deleteByExample" parameterType="cn.edu.nwsuaf.entity.TeacherExample">
+        delete from TEACHER
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </delete>
+    <insert id="insert" parameterType="cn.edu.nwsuaf.entity.Teacher">
+    insert into TEACHER (id, departmentid, userid, 
+      teacherno, teachername, telephone, 
+      email, status)
+    values (#{id,jdbcType=INTEGER}, #{departmentid,jdbcType=INTEGER}, #{userid,jdbcType=INTEGER}, 
+      #{teacherno,jdbcType=VARCHAR}, #{teachername,jdbcType=VARCHAR}, #{telephone,jdbcType=VARCHAR}, 
+      #{email,jdbcType=VARCHAR}, #{status,jdbcType=BIT})
+  </insert>
+    <insert id="insertSelective" parameterType="cn.edu.nwsuaf.entity.Teacher">
+        insert into TEACHER
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="departmentid != null">
+                departmentid,
+            </if>
+            <if test="userid != null">
+                userid,
+            </if>
+            <if test="teacherno != null">
+                teacherno,
+            </if>
+            <if test="teachername != null">
+                teachername,
+            </if>
+            <if test="telephone != null">
+                telephone,
+            </if>
+            <if test="email != null">
+                email,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="departmentid != null">
+                #{departmentid,jdbcType=INTEGER},
+            </if>
+            <if test="userid != null">
+                #{userid,jdbcType=INTEGER},
+            </if>
+            <if test="teacherno != null">
+                #{teacherno,jdbcType=VARCHAR},
+            </if>
+            <if test="teachername != null">
+                #{teachername,jdbcType=VARCHAR},
+            </if>
+            <if test="telephone != null">
+                #{telephone,jdbcType=VARCHAR},
+            </if>
+            <if test="email != null">
+                #{email,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=BIT},
+            </if>
+        </trim>
+    </insert>
+    <select id="countByExample" parameterType="cn.edu.nwsuaf.entity.TeacherExample" resultType="java.lang.Integer">
+        select count(*) from TEACHER
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </select>
+    <update id="updateByExampleSelective" parameterType="map">
+        update TEACHER
+        <set>
+            <if test="record.id != null">
+                id = #{record.id,jdbcType=INTEGER},
+            </if>
+            <if test="record.departmentid != null">
+                departmentid = #{record.departmentid,jdbcType=INTEGER},
+            </if>
+            <if test="record.userid != null">
+                userid = #{record.userid,jdbcType=INTEGER},
+            </if>
+            <if test="record.teacherno != null">
+                teacherno = #{record.teacherno,jdbcType=VARCHAR},
+            </if>
+            <if test="record.teachername != null">
+                teachername = #{record.teachername,jdbcType=VARCHAR},
+            </if>
+            <if test="record.telephone != null">
+                telephone = #{record.telephone,jdbcType=VARCHAR},
+            </if>
+            <if test="record.email != null">
+                email = #{record.email,jdbcType=VARCHAR},
+            </if>
+            <if test="record.status != null">
+                status = #{record.status,jdbcType=BIT},
+            </if>
+        </set>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByExample" parameterType="map">
+        update TEACHER
+        set id = #{record.id,jdbcType=INTEGER},
+        departmentid = #{record.departmentid,jdbcType=INTEGER},
+        userid = #{record.userid,jdbcType=INTEGER},
+        teacherno = #{record.teacherno,jdbcType=VARCHAR},
+        teachername = #{record.teachername,jdbcType=VARCHAR},
+        telephone = #{record.telephone,jdbcType=VARCHAR},
+        email = #{record.email,jdbcType=VARCHAR},
+        status = #{record.status,jdbcType=BIT}
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByPrimaryKeySelective" parameterType="cn.edu.nwsuaf.entity.Teacher">
+        update TEACHER
+        <set>
+            <if test="departmentid != null">
+                departmentid = #{departmentid,jdbcType=INTEGER},
+            </if>
+            <if test="userid != null">
+                userid = #{userid,jdbcType=INTEGER},
+            </if>
+            <if test="teacherno != null">
+                teacherno = #{teacherno,jdbcType=VARCHAR},
+            </if>
+            <if test="teachername != null">
+                teachername = #{teachername,jdbcType=VARCHAR},
+            </if>
+            <if test="telephone != null">
+                telephone = #{telephone,jdbcType=VARCHAR},
+            </if>
+            <if test="email != null">
+                email = #{email,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=BIT},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="cn.edu.nwsuaf.entity.Teacher">
+    update TEACHER
+    set departmentid = #{departmentid,jdbcType=INTEGER},
+      userid = #{userid,jdbcType=INTEGER},
+      teacherno = #{teacherno,jdbcType=VARCHAR},
+      teachername = #{teachername,jdbcType=VARCHAR},
+      telephone = #{telephone,jdbcType=VARCHAR},
+      email = #{email,jdbcType=VARCHAR},
+      status = #{status,jdbcType=BIT}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
